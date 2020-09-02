@@ -6,9 +6,13 @@ A simple q-learning agent trains via reinforcement learning on a Q-table to lear
 Player starts at top-left-hand corner and must learn to find his/her way down to the goal at bottom-right-hand corner. 
 For example:
 S F F F
+
 F F F H
+
 F H F H
+
 H F F G
+
 
 F = normal floor
 S = starting / normal floor
