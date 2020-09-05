@@ -8,7 +8,7 @@ import time
 import sys #for debugging try/catch
 
 class QLearnAgent:
-    def __init__(self, learning_rate=0.05, discount_rate=0.9, epsilon = 0.9, epsilon_decay = 0.99999, epsilon_minimum=0.1):
+    def __init__(self, learning_rate=0.1, discount_rate=0.95, epsilon = 0.9, epsilon_decay = 0.999, epsilon_minimum=0.1):
         self.q_table = self._init_q_table()
         self.learning_rate = learning_rate
         self.discount_rate = discount_rate
@@ -24,7 +24,7 @@ class QLearnAgent:
 
     #* Save Q-table 
 
-    #* Train Q-Learning Agent               
+    #* Train Q-Learning Agent              
     def train(self, num_of_episodes, fps=10):
         env = Pitfalls()
         render = False
@@ -66,7 +66,8 @@ class QLearnAgent:
                         self.q_table[(prev_observation)][action] = 100 # Goal reward is 0; no penalty
                         
                         #debug
-                        #print("[+] Q-Learning agent reached the goal at episode {EPS}!".format(EPS=eps))
+                        print("[+] Q-Learning agent reached the goal at episode {EPS}!".format(EPS=eps))
+                        #print(self.q_table)
                         #print("Prev obs: {PREV}; Action: {ACTION}".format(PREV=prev_observation, ACTION=action))
 
                         break
@@ -106,7 +107,7 @@ class QLearnAgent:
         env = Pitfalls()
         print("[+] Playing from trained data!")
 
-        for game in range(0, num_of_times):
+        for eps in range(0, num_of_times):
             env.reset()
             prev_observation = []
 
@@ -120,7 +121,7 @@ class QLearnAgent:
                     action = np.argmax(self.q_table[prev_observation])
 
                     #debug
-                    print("[PLAY] Chosen action:", action)
+                    #print("[PLAY] Chosen action:", action)
 
                 else:
                     action = env.action_space_sample()
@@ -138,7 +139,7 @@ class QLearnAgent:
                     prev_observation = observation
 
                 if done:
-                    print("[+] Game ended.", info)
+                    print("[+] Game ended in {EPS} episodes.".format(EPS=eps), info)
                     break
 
             time.sleep(1)
@@ -149,19 +150,17 @@ class QLearnAgent:
 #? Test bed
 if __name__ == "__main__":
     #* Test agent
-    qla = QLearnAgent()
+    qla = QLearnAgent(learning_rate=0.05, discount_rate=0.95, epsilon = 0.9, epsilon_decay = 0.99999, epsilon_minimum=0.3)
 
     #print(qla.q_table)
     #sys.exit(1)
 
     #* Cumulative training
 
-    qla.train(3000)
+    qla.train(15000)
     #qla.save()
 
     qla.play(fps=10, num_of_times=5)
-    
-    print("Q-table:\n", qla.q_table)
     
     #observation, reward, done, _ = env.step(2)
     #print(observation,reward,done, _)

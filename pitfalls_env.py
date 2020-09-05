@@ -9,7 +9,8 @@ class Pitfalls:
     def __init__(self, height=8, width=8, starvation_move=200):
         self.height = height
         self.width = width
-        self.rewards_table = self._init_rewards_table(height=height, width=width)
+        self.rewards_table = self._init_difficult_rewards_table(height=height, width=width)
+        #self.rewards_table = self._init_rewards_table(height=height, width=width) # Standard difficulty or Normal
         self.starvation_move = starvation_move
 
     def reset(self):
@@ -58,7 +59,7 @@ class Pitfalls:
             self.done = True
 
             #debug
-            print("Starved to death!")
+            #print("Starved to death!")
 
             return self.current_pos, reward, self.done, {'msg':'Starved to death.'}
 
@@ -93,7 +94,7 @@ class Pitfalls:
     def render(self):
         pass
 
-    #* Create a reward table 8 by 8 states
+    #* Normal: Create a reward table 8 by 8 states
     def _init_rewards_table(self, height, width):
         #? Idea: Negative reinforcement reduces as agent approaches goal
         '''
@@ -106,7 +107,6 @@ class Pitfalls:
         F H F F H F H F
         F F F H F F F G
         '''
-
         rewards_table = np.zeros(shape=(height, width))
 
         #* Set all state to various negative reinforcement
@@ -127,6 +127,57 @@ class Pitfalls:
         rewards_table[2][3] = -100
         rewards_table[3][5] = -100
         rewards_table[4][3] = -100
+        rewards_table[5][1] = -100
+        rewards_table[5][2] = -100
+        rewards_table[5][6] = -100
+        rewards_table[6][1] = -100
+        rewards_table[6][4] = -100
+        rewards_table[6][6] = -100
+        rewards_table[7][3] = -100
+
+        # Goal is 100 reward
+        rewards_table[7][7] = 100
+
+        #debug
+        print("rewards_table:\n", rewards_table)
+        print("")
+
+        return rewards_table
+
+    #* Difficult: Create a reward table 8 by 8 states
+    def _init_difficult_rewards_table(self, height, width):
+        #? Idea: Negative reinforcement reduces as agent approaches goal
+        '''
+        S F F F F F F F
+        F F F F F F F F
+        F F F H F F F F
+        F F F F F H F F
+        F F F H F F F H
+        F H H F F F H F
+        F H F F H F H F
+        F F F H F F F G
+        '''
+        rewards_table = np.zeros(shape=(height, width))
+
+        #* Set all state to various negative reinforcement
+        #  -3 for [2][2] and below
+        #  -2 for [4][4] and below
+        #  -1 for [5][5] and above
+        for row, y in enumerate(rewards_table):
+            for col, x in enumerate(rewards_table[row]):
+                if  row <= 2 and col <= 2:
+                    rewards_table[row][col] = -3
+                elif (row > 2 and row <= 4) or (col > 2 and col <=4):
+                    rewards_table[row][col] = -2
+                else:
+                    rewards_table[row][col] = -1
+
+
+        # Holes are -100 reward
+        rewards_table[2][3] = -100
+        rewards_table[3][5] = -100
+        rewards_table[4][3] = -100
+        rewards_table[4][7] = -100
         rewards_table[5][1] = -100
         rewards_table[5][2] = -100
         rewards_table[5][6] = -100
